@@ -1,0 +1,26 @@
+project.ext.springboot_version = '2.5.5'
+
+allprojects {
+    group 'org.cassandra.client'
+    version '1.0-SNAPSHOT'
+}
+subprojects {
+    apply plugin: 'java-library'
+    tasks.withType(JavaCompile) {
+        options.encoding("UTF-8")
+    }
+    test {
+        useJUnitPlatform()
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        compileOnly "org.projectlombok:lombok:1.18.18"
+        annotationProcessor "org.projectlombok:lombok:1.18.18"
+        testCompileOnly "org.projectlombok:lombok:1.18.18"
+        testAnnotationProcessor "org.projectlombok:lombok:1.18.18"
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    }
+}
