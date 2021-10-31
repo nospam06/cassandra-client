@@ -5,15 +5,12 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import lombok.extern.slf4j.Slf4j;
 import org.cassandra.client.api.CassandraClient;
-import org.cassandra.client.data.Row;
-import org.cassandra.client.data.RowData;
-import org.cassandra.client.data.TableData;
-import org.cassandra.client.data.TableMetaData;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,13 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Slf4j
 public class CassandraClientImpl implements CassandraClient {
+    private static final String SYSTEM_SCHEMA = "system_schema";
+    private static final String DATACENTER = "datacenter1";
     private static final String LIST_KEYSPACES = "SELECT keyspace_name FROM keyspaces";
     private static final String CREATE_KEYSPACE = "create keyspace if not exists %s";
-    private static final String SYSTEM_SCHEMA = "system_schema";
-    private static final String LIST_METADATA = "select * from system_schema.columns where keyspace_name = '%s' and table_name = '%s'";
     private static final String LIST_TABLES = "select table_name from system_schema.tables where keyspace_name = '%s'";
+    private static final String TABLE_METADATA = "select * from system_schema.columns where keyspace_name = '%s' and table_name = '%s'";
     private static final String SELECT_QUERY = "select * from %s.%s";
-    private static final String DATACENTER = "datacenter1";
     private final ConcurrentHashMap<String, CqlSession> sessionMap = new ConcurrentHashMap<>();
 
     @Override
@@ -58,40 +55,31 @@ public class CassandraClientImpl implements CassandraClient {
     }
 
     @Override
-    public List<TableMetaData> tableMetaData(String sessionUuid, String keyspace, String tableName) {
-        ResultSet resultSet = executeInternal(sessionUuid, String.format(LIST_METADATA, keyspace, tableName));
+    public LinkedHashMap<String, String> tableMetaData(String sessionUuid, String keyspace, String tableName) {
+        ResultSet resultSet = executeInternal(sessionUuid, String.format(TABLE_METADATA, keyspace, tableName));
         return createMetaData(resultSet);
     }
 
     @Override
-    public TableData tableData(String sessionUuid, String keyspace, String tableName) {
+    public List<LinkedHashMap<String, String>> tableData(String sessionUuid, String keyspace, String tableName) {
         ResultSet resultSet = executeInternal(sessionUuid, String.format(SELECT_QUERY, keyspace, tableName));
-        List<TableMetaData> metaData = createMetaData(resultSet);
-        TableData tableData = new TableData();
-        List<Row> rows = new ArrayList<>();
-        tableData.setColumns(metaData);
-        tableData.setRows(rows);
+        LinkedHashMap<String, String> metaData = createMetaData(resultSet);
+        List<LinkedHashMap<String, String>> rows = new ArrayList<>();
         resultSet.forEach(r -> {
-            Row row = new Row();
+            LinkedHashMap<String, String> row = new LinkedHashMap<>();
             rows.add(row);
-            for (int i = 0; i < metaData.size(); ++i) {
-                TableMetaData tableMetaData = metaData.get(i);
-                Optional.ofNullable(r.getObject(i)).map(Object::toString)
-                        .ifPresent(data -> {
-                            RowData rowData = new RowData(tableMetaData.getColumn(), data);
-                            row.getRows().add(rowData);
-                        });
-            }
+            metaData.forEach((k, v) -> {
+                String column = metaData.get(k);
+                Optional.ofNullable(r.getObject(column)).map(Object::toString)
+                        .ifPresent(data -> row.put(column, data));
+            });
         });
-        return tableData;
+        return rows;
     }
 
-    private List<TableMetaData> createMetaData(ResultSet resultSet) {
-        List<TableMetaData> metaData = new ArrayList<>();
-        resultSet.getColumnDefinitions().forEach(c -> {
-            TableMetaData tableMetaData = new TableMetaData(c.getName().asCql(true), c.getType().asCql(false, true));
-            metaData.add(tableMetaData);
-        });
+    private LinkedHashMap<String, String> createMetaData(ResultSet resultSet) {
+        LinkedHashMap<String, String> metaData = new LinkedHashMap<>();
+        resultSet.forEach(c -> metaData.put(c.getString("column_name"), c.getString("type")));
         return metaData;
     }
 
@@ -101,7 +89,6 @@ public class CassandraClientImpl implements CassandraClient {
     }
 
     private ResultSet executeInternal(String sessionUuid, String query) {
-        log.info("{}", query);
         CqlSession cqlSession = sessionMap.get(sessionUuid);
         return cqlSession.execute(query);
     }

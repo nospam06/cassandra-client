@@ -1,8 +1,6 @@
 package org.cassandra.client.api;
 
-import org.cassandra.client.data.TableData;
-import org.cassandra.client.data.TableMetaData;
-
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +11,9 @@ public interface CassandraClient {
 
     List<String> listTables(String sessionUuid, String keyspace);
 
-    List<TableMetaData> tableMetaData(String sessionUuid, String keyspace, String tableName);
+    LinkedHashMap<String, String> tableMetaData(String sessionUuid, String keyspace, String tableName);
 
-    TableData tableData(String sessionUuid, String keyspace, String tableName);
+    List<LinkedHashMap<String, String>> tableData(String sessionUuid, String keyspace, String tableName);
 
     void executeQuery(String sessionUuid, String query);
 }

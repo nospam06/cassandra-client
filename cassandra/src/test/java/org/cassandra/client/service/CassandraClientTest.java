@@ -1,12 +1,11 @@
 package org.cassandra.client.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cassandra.client.data.TableData;
-import org.cassandra.client.data.TableMetaData;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ class CassandraClientTest {
     void tableMetaData() {
         Map<String, List<String>> keySpaces = cassandraClient.connect("localhost", 9042, "foo", "bar");
         String sessionUuid = keySpaces.keySet().iterator().next();
-        List<TableMetaData> metaData = cassandraClient.tableMetaData(sessionUuid, "system_schema", "columns");
+        LinkedHashMap<String, String> metaData = cassandraClient.tableMetaData(sessionUuid, "system_schema", "columns");
         log.info("{}", metaData);
     }
 
@@ -37,7 +36,7 @@ class CassandraClientTest {
     void tableData() {
         Map<String, List<String>> keySpaces = cassandraClient.connect("localhost", 9042, "foo", "bar");
         String sessionUuid = keySpaces.keySet().iterator().next();
-        TableData tableData = cassandraClient.tableData(sessionUuid, "mydb", "address_book");
+        List<LinkedHashMap<String, String>> tableData = cassandraClient.tableData(sessionUuid, "mydb", "address_book");
         log.info("{}", tableData);
     }
 }

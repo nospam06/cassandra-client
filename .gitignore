@@ -1,4 +1,3 @@
 /.gradle/
 /.idea/
-/cassandra/build/
-/microservice/build/
+**/build/
