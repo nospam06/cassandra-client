@@ -29,11 +29,12 @@ public class CassandraClientImpl implements CassandraClient {
     private static final String LIST_METADATA = "select * from system_schema.columns where keyspace_name = '%s' and table_name = '%s'";
     private static final String LIST_TABLES = "select table_name from system_schema.tables where keyspace_name = '%s'";
     private static final String SELECT_QUERY = "select * from %s.%s";
+    private static final String DATACENTER = "datacenter1";
     private final ConcurrentHashMap<String, CqlSession> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     public Map<String, List<String>> connect(String url, int port, String userId, String password) {
-        CqlSession cqlSession = createSession(url, port, SYSTEM_SCHEMA);
+        CqlSession cqlSession = createSession(url, port);
         String sessionUuid = UUID.randomUUID().toString();
         sessionMap.put(sessionUuid, cqlSession);
         ResultSet resultSet = executeInternal(sessionUuid, LIST_KEYSPACES);
@@ -43,7 +44,7 @@ public class CassandraClientImpl implements CassandraClient {
     }
 
     @Override
-    public List<String> createKeySpace(String sessionUuid, String keyspace) {
+    public List<String> createKeyspace(String sessionUuid, String keyspace) {
         executeInternal(sessionUuid, String.format(CREATE_KEYSPACE, keyspace));
         return listTables(sessionUuid, keyspace);
     }
@@ -100,13 +101,14 @@ public class CassandraClientImpl implements CassandraClient {
     }
 
     private ResultSet executeInternal(String sessionUuid, String query) {
+        log.info("{}", query);
         CqlSession cqlSession = sessionMap.get(sessionUuid);
         return cqlSession.execute(query);
     }
 
-    private CqlSession createSession(String url, int port, String keyspace) {
+    private CqlSession createSession(String url, int port) {
         return CqlSession.builder().addContactPoint(new InetSocketAddress(url, port))
-                .withKeyspace(keyspace).withLocalDatacenter("datacenter1").build();
+                .withKeyspace(SYSTEM_SCHEMA).withLocalDatacenter(DATACENTER).build();
     }
 
     @PreDestroy

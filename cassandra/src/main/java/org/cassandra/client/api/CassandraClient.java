@@ -9,7 +9,7 @@ import java.util.Map;
 public interface CassandraClient {
     Map<String, List<String>> connect(String url, int port, String userId, String password);
 
-    List<String> createKeySpace(String sessionUuid, String keyspace);
+    List<String> createKeyspace(String sessionUuid, String keyspace);
 
     List<String> listTables(String sessionUuid, String keyspace);
 

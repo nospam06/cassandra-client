@@ -3,6 +3,7 @@ package org.cassandra.client.service;
 import lombok.extern.slf4j.Slf4j;
 import org.cassandra.client.data.TableData;
 import org.cassandra.client.data.TableMetaData;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Disabled
 class CassandraClientTest {
     private final CassandraClientImpl cassandraClient = new CassandraClientImpl();
 

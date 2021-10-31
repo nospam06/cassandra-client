@@ -1,4 +1,5 @@
 rootProject.name = 'cassadra-client'
 include 'cassandra'
 include 'microservice'
+include 'web'
 

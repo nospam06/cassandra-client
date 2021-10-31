@@ -1,3 +1,4 @@
 dependencies {
-    api "org.springframework.boot:spring-boot-starter-data-cassandra:$project.springboot_version"
+    implementation "org.springframework.boot:spring-boot-starter:$project.springboot_version"
+    implementation "com.datastax.oss:java-driver-core:4.13.0"
 }

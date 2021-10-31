@@ -1,4 +1,17 @@
 plugins {
-   // id "org.springframework.boot" version "2.5.5"
+    id "org.springframework.boot" version "2.5.5"
 }
 
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter:$project.springboot_version"
+    runtimeOnly project(':web')
+}
+
+bootJar {
+    mainClass.set('org.cassandra.client.Application')
+    archiveBaseName.set('cassandra-client')
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", System.properties.get("spring.profiles.active")
+}
