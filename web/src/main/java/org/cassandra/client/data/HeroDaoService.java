@@ -9,5 +9,7 @@ public interface HeroDaoService {
 
     Hero add(Hero hero);
 
+    Hero update(Hero hero);
+
     void delete(Integer id);
 }

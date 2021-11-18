@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,16 +26,29 @@ public class HeroController {
     private final HeroDaoService daoService;
 
     @GetMapping
-    public Collection<Hero> getOne(@RequestParam(required = false) Integer id) {
-        if  (id == null) {
-            return daoService.findAll();
+    public Collection<Hero> findAll(@RequestParam(required = false) String name) {
+        Collection<Hero> all = daoService.findAll();
+        if (name == null) {
+            return all;
         }
-        return Optional.ofNullable(daoService.findOne(id)).map(List::of).orElse(null);
+        String lowerCase = name.toLowerCase();
+        return all.stream().filter(h -> h.getName().toLowerCase().contains(name)).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public Hero getOne(@PathVariable Integer id) {
+        return daoService.findOne(id);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public Hero add(@RequestBody Hero hero) {
         return daoService.add(hero);
+    }
+
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Hero update(@RequestBody Hero hero) {
+        return daoService.update(hero);
     }
 
     @DeleteMapping("/{id}")

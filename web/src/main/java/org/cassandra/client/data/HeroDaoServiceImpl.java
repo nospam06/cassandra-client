@@ -37,6 +37,12 @@ public class HeroDaoServiceImpl implements HeroDaoService {
     }
 
     @Override
+    public Hero update(Hero hero) {
+        HEROES.put(hero.getId(), hero);
+        return hero;
+    }
+
+    @Override
     public void delete(Integer id) {
         HEROES.remove(id);
     }
