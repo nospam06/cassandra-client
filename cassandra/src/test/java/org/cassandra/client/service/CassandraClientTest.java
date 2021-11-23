@@ -1,13 +1,11 @@
 package org.cassandra.client.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.KeyspaceResponse;
+import org.example.dto.SessionResponse;
+import org.example.dto.TableResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Disabled
@@ -16,27 +14,27 @@ class CassandraClientTest {
 
     @Test
     void connect() {
-        Map<String, List<String>> keySpaces = cassandraClient.connect("localhost", 9042, "foo", "bar");
-        String sessionUuid = keySpaces.keySet().iterator().next();
-        keySpaces.values().stream().flatMap(Collection::stream).forEach(ks -> {
-            List<String> tables = cassandraClient.listTables(sessionUuid, ks);
+        SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
+        String sessionUuid = response.getSessionUuid();
+        response.getKeyspaces().forEach(ks -> {
+            KeyspaceResponse tables = cassandraClient.listTables(sessionUuid, ks);
             log.info("Tables in keyspace {} -> {}", ks, tables);
         });
     }
 
     @Test
     void tableMetaData() {
-        Map<String, List<String>> keySpaces = cassandraClient.connect("localhost", 9042, "foo", "bar");
-        String sessionUuid = keySpaces.keySet().iterator().next();
-        LinkedHashMap<String, String> metaData = cassandraClient.tableMetaData(sessionUuid, "system_schema", "columns");
+        SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
+        String sessionUuid = response.getSessionUuid();
+        TableResponse metaData = cassandraClient.tableMetaData(sessionUuid, "system_schema", "columns");
         log.info("{}", metaData);
     }
 
     @Test
     void tableData() {
-        Map<String, List<String>> keySpaces = cassandraClient.connect("localhost", 9042, "foo", "bar");
-        String sessionUuid = keySpaces.keySet().iterator().next();
-        List<LinkedHashMap<String, String>> tableData = cassandraClient.tableData(sessionUuid, "mydb", "address_book");
+        SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
+        String sessionUuid = response.getSessionUuid();
+        TableResponse tableData = cassandraClient.tableData(sessionUuid, "mydb", "address_book");
         log.info("{}", tableData);
     }
 }

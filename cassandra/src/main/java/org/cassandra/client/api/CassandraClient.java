@@ -1,19 +1,19 @@
 package org.cassandra.client.api;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import org.example.dto.KeyspaceResponse;
+import org.example.dto.SessionResponse;
+import org.example.dto.TableResponse;
 
 public interface CassandraClient {
-    Map<String, List<String>> connect(String url, int port, String userId, String password);
+    SessionResponse connect(String url, int port, String userId, String password);
 
-    List<String> createKeyspace(String sessionUuid, String keyspace);
+    KeyspaceResponse createKeyspace(String sessionUuid, String keyspace);
 
-    List<String> listTables(String sessionUuid, String keyspace);
+    KeyspaceResponse listTables(String sessionUuid, String keyspace);
 
-    LinkedHashMap<String, String> tableMetaData(String sessionUuid, String keyspace, String tableName);
+    TableResponse tableMetaData(String sessionUuid, String keyspace, String tableName);
 
-    List<LinkedHashMap<String, String>> tableData(String sessionUuid, String keyspace, String tableName);
+    TableResponse tableData(String sessionUuid, String keyspace, String tableName);
 
     void executeQuery(String sessionUuid, String query);
 }

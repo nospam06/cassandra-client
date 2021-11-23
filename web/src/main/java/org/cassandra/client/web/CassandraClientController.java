@@ -1,49 +1,44 @@
 package org.cassandra.client.web;
 
+import org.example.dto.KeyspaceRequest;
+import org.example.dto.KeyspaceResponse;
+import org.example.dto.SessionRequest;
 import lombok.RequiredArgsConstructor;
 import org.cassandra.client.api.CassandraClient;
-import org.cassandra.client.data.KeyspaceRequest;
-import org.cassandra.client.data.SessionRequest;
-import org.cassandra.client.data.TableRequest;
+import org.example.dto.SessionResponse;
+import org.example.dto.TableRequest;
+import org.example.dto.TableResponse;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RequestMapping(path = "/api/cassandra", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CassandraClientController {
     private final CassandraClient client;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, List<String>> login(@RequestBody SessionRequest request) {
+    public SessionResponse login(@RequestBody SessionRequest request) {
          return client.connect(request.getUrl(), request.getPort(), request.getUserId(), request.getPassword());
     }
 
     @PostMapping(value = "/keyspace", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> createKeyspace(@RequestBody KeyspaceRequest request) {
-        return client.createKeyspace(request.getSessionUuid(), request.getKeyspace());
-    }
-
-    @GetMapping(value = "/keyspace", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> listKeyspace(@RequestBody KeyspaceRequest request) {
+    public KeyspaceResponse listTables(@RequestBody KeyspaceRequest request) {
         return client.listTables(request.getSessionUuid(), request.getKeyspace());
     }
 
-    @GetMapping(value = "/table", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<LinkedHashMap<String, String>> tableQuery(@RequestBody TableRequest request) {
+    @PostMapping(value = "/table", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public TableResponse tableQuery(@RequestBody TableRequest request) {
         return client.tableData(request.getSessionUuid(), request.getKeyspace(), request.getTable());
     }
 
-    @GetMapping(value = "/table/meta", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public LinkedHashMap<String, String> tableMetadata(@RequestBody TableRequest request) {
+    @PostMapping(value = "/table/meta", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public TableResponse tableMetadata(@RequestBody TableRequest request) {
         return client.tableMetaData(request.getSessionUuid(), request.getKeyspace(), request.getTable());
     }
 }
