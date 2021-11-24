@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CassandraClientController {
     private final CassandraClient client;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/session", consumes = MediaType.APPLICATION_JSON_VALUE)
     public SessionResponse login(@RequestBody SessionRequest request) {
          return client.connect(request.getUrl(), request.getPort(), request.getUserId(), request.getPassword());
     }
@@ -35,10 +35,5 @@ public class CassandraClientController {
     @PostMapping(value = "/table", consumes = MediaType.APPLICATION_JSON_VALUE)
     public TableResponse tableQuery(@RequestBody TableRequest request) {
         return client.tableData(request.getSessionUuid(), request.getKeyspace(), request.getTable());
-    }
-
-    @PostMapping(value = "/table/meta", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public TableResponse tableMetadata(@RequestBody TableRequest request) {
-        return client.tableMetaData(request.getSessionUuid(), request.getKeyspace(), request.getTable());
     }
 }

@@ -11,8 +11,6 @@ public interface CassandraClient {
 
     KeyspaceResponse listTables(String sessionUuid, String keyspace);
 
-    TableResponse tableMetaData(String sessionUuid, String keyspace, String tableName);
-
     TableResponse tableData(String sessionUuid, String keyspace, String tableName);
 
     void executeQuery(String sessionUuid, String query);

@@ -27,7 +27,6 @@ public class CassandraClientImpl implements CassandraClient {
     private static final String LIST_KEYSPACES = "SELECT keyspace_name FROM keyspaces";
     private static final String CREATE_KEYSPACE = "create keyspace if not exists %s";
     private static final String LIST_TABLES = "select table_name from system_schema.tables where keyspace_name = '%s'";
-    private static final String TABLE_METADATA = "select * from system_schema.columns where keyspace_name = '%s' and table_name = '%s'";
     private static final String SELECT_QUERY = "select * from %s.%s";
     private final ConcurrentHashMap<String, CqlSession> sessionMap = new ConcurrentHashMap<>();
 
@@ -57,12 +56,6 @@ public class CassandraClientImpl implements CassandraClient {
     }
 
     @Override
-    public TableResponse tableMetaData(String sessionUuid, String keyspace, String tableName) {
-        ResultSet resultSet = executeInternal(sessionUuid, String.format(TABLE_METADATA, keyspace, tableName));
-        return new TableResponse(tableName, createMetaData(resultSet), List.of());
-    }
-
-    @Override
     public TableResponse tableData(String sessionUuid, String keyspace, String tableName) {
         ResultSet resultSet = executeInternal(sessionUuid, String.format(SELECT_QUERY, keyspace, tableName));
         List<TableMetaData> metaData = createMetaData(resultSet);
@@ -70,10 +63,7 @@ public class CassandraClientImpl implements CassandraClient {
         resultSet.forEach(r -> {
             List<String> row = new ArrayList<>();
             rows.add(row);
-            metaData.forEach(m -> {
-                Optional.ofNullable(r.getObject(m.getName())).map(Object::toString)
-                        .ifPresentOrElse(row::add, () -> row.add(""));
-            });
+            metaData.forEach(m -> row.add(Optional.ofNullable(r.getObject(m.getName())).map(Object::toString).orElse("")));
         });
         return new TableResponse(tableName, metaData, rows);
     }
