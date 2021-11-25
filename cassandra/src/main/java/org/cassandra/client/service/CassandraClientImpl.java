@@ -3,7 +3,6 @@ package org.cassandra.client.service;
 import com.datastax.oss.driver.api.core.AsyncAutoCloseable;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import lombok.extern.slf4j.Slf4j;
 import org.cassandra.client.api.CassandraClient;
 import org.example.dto.KeyspaceResponse;
 import org.example.dto.SessionResponse;
@@ -20,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Slf4j
 public class CassandraClientImpl implements CassandraClient {
     private static final String SYSTEM_SCHEMA = "system_schema";
     private static final String DATACENTER = "datacenter1";

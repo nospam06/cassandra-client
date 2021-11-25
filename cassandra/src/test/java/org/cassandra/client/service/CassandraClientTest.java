@@ -21,15 +21,7 @@ class CassandraClientTest {
             log.info("Tables in keyspace {} -> {}", ks, tables);
         });
     }
-
-    @Test
-    void tableMetaData() {
-        SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
-        String sessionUuid = response.getSessionUuid();
-        TableResponse metaData = cassandraClient.tableMetaData(sessionUuid, "system_schema", "columns");
-        log.info("{}", metaData);
-    }
-
+    
     @Test
     void tableData() {
         SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
