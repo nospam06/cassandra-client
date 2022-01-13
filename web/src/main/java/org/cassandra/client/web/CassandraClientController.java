@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"}, maxAge = 3600)
 @RequestMapping(path = "/api/cassandra", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CassandraClientController {
     private final CassandraClient client;
@@ -29,7 +29,7 @@ public class CassandraClientController {
 
     @PostMapping(value = "/keyspace", consumes = MediaType.APPLICATION_JSON_VALUE)
     public KeyspaceResponse listTables(@RequestBody KeyspaceRequest request) {
-        return client.listTables(request.getSessionUuid(), request.getKeyspace());
+        return client.listTable(request.getSessionUuid(), request.getKeyspace());
     }
 
     @PostMapping(value = "/table", consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -9,7 +9,7 @@ public interface CassandraClient {
 
     KeyspaceResponse createKeyspace(String sessionUuid, String keyspace);
 
-    KeyspaceResponse listTables(String sessionUuid, String keyspace);
+    KeyspaceResponse listTable(String sessionUuid, String keyspace);
 
     TableResponse tableData(String sessionUuid, String keyspace, String tableName);
 

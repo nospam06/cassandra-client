@@ -42,11 +42,11 @@ public class CassandraClientImpl implements CassandraClient {
     @Override
     public KeyspaceResponse createKeyspace(String sessionUuid, String keyspace) {
         executeInternal(sessionUuid, String.format(CREATE_KEYSPACE, keyspace));
-        return listTables(sessionUuid, keyspace);
+        return listTable(sessionUuid, keyspace);
     }
 
     @Override
-    public KeyspaceResponse listTables(String sessionUuid, String keyspace) {
+    public KeyspaceResponse listTable(String sessionUuid, String keyspace) {
         ResultSet resultSet = executeInternal(sessionUuid, String.format(LIST_TABLES, keyspace));
         List<String> names = new ArrayList<>();
         resultSet.forEach(rs -> names.add(rs.getString(0)));

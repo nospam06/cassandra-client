@@ -17,7 +17,7 @@ class CassandraClientTest {
         SessionResponse response = cassandraClient.connect("localhost", 9042, "foo", "bar");
         String sessionUuid = response.getSessionUuid();
         response.getKeyspaces().forEach(ks -> {
-            KeyspaceResponse tables = cassandraClient.listTables(sessionUuid, ks);
+            KeyspaceResponse tables = cassandraClient.listTable(sessionUuid, ks);
             log.info("Tables in keyspace {} -> {}", ks, tables);
         });
     }
